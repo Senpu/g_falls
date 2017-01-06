@@ -3,7 +3,7 @@ package com.cocktail_games_inc.client;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import com.cocktail_games_inc.G_falls;
+import com.cocktail_games_inc.GameScreen;
 
 public class HtmlLauncher extends GwtApplication {
 
@@ -14,6 +14,6 @@ public class HtmlLauncher extends GwtApplication {
 
         @Override
         public ApplicationListener createApplicationListener () {
-                return new G_falls();
+                return new GameScreen();
         }
 }

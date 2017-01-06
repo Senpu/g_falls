@@ -4,7 +4,6 @@ import android.os.Bundle;
 
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import com.cocktail_games_inc.G_falls;
 
 public class AndroidLauncher extends AndroidApplication {
 	@Override
@@ -13,6 +12,6 @@ public class AndroidLauncher extends AndroidApplication {
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		config.useCompass = false;
 		config.useAccelerometer = false;
-		initialize(new G_falls(), config);
+		initialize(new GameScreen(), config);
 	}
 }
