@@ -15,8 +15,13 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.badlogic.gdx.utils.Timer;
 
 import java.util.Iterator;
+import java.util.TimerTask;
+import java.util.logging.Handler;
+
+import static com.badlogic.gdx.Input.Keys.R;
 
 public class GameScreen implements Screen {
 
@@ -45,7 +50,7 @@ public class GameScreen implements Screen {
 		this.game = gam;
 
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		camera.setToOrtho(false, 480, 600);
 
 		batch = new SpriteBatch();
 
@@ -64,10 +69,10 @@ public class GameScreen implements Screen {
 		bg_music.play();
 
 		rec_hero = new Rectangle();
-		rec_hero.x = 800 / 2 - 64 / 2;
-		rec_hero.y = 20;
-		rec_hero.width = 64;
-		rec_hero.height = 64;
+		rec_hero.x = 480 / 2 - 60 / 2;
+		rec_hero.y = 90;
+		rec_hero.width = 60;
+		rec_hero.height = 60;
 
 		firedrops = new Array<Rectangle>();
 		spawnFireDrop();
@@ -78,10 +83,10 @@ public class GameScreen implements Screen {
 
 	private void spawnFireDrop() {
 		Rectangle fireDrop = new Rectangle();
-		fireDrop.x = MathUtils.random(0, 800 - 64);
-		fireDrop.y = 480;
-		fireDrop.width = 64;
-		fireDrop.height = 64;
+		fireDrop.x = MathUtils.random(0, 480 - 50);
+		fireDrop.y = 600;
+		fireDrop.width = 50;
+		fireDrop.height = 50;
 		firedrops.add(fireDrop);
 		lastDropTime = TimeUtils.nanoTime();
 	}
@@ -94,8 +99,8 @@ public class GameScreen implements Screen {
 
 		game.batch.setProjectionMatrix(camera.combined);
 		game.batch.begin();
-		game.font.draw(game.batch, "Bombs dodged: " + isDodged, 0, 600);
 		game.batch.draw(bg_img, 0, 0, Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+		game.font.draw(game.batch, "Bombs dodged: " + isDodged, 5, 600);
 		game.batch.draw(heroImage, rec_hero.x, rec_hero.y);
 		for (Rectangle firedrop : firedrops) {
 			game.batch.draw(fireImage, firedrop.x, firedrop.y);
@@ -105,32 +110,33 @@ public class GameScreen implements Screen {
 		if (Gdx.input.isTouched()) {
 			touchPos.set(Gdx.input.getX(), Gdx.input.getY(), 0);
 			camera.unproject(touchPos);
-			rec_hero.x = (int) (touchPos.x - 64 / 2);
+			rec_hero.x = (int) (touchPos.x - 60 / 2);
 		}
 
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) rec_hero.x -= 200 * Gdx.graphics.getDeltaTime();
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) rec_hero.x += 200 * Gdx.graphics.getDeltaTime();
+		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) rec_hero.x -= 400 * Gdx.graphics.getDeltaTime();
+		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) rec_hero.x += 400 * Gdx.graphics.getDeltaTime();
 
 		if (rec_hero.x < 0) rec_hero.x = 0;
-		if (rec_hero.x > 800 - 64) rec_hero.x = 800 - 64;
+		if (rec_hero.x > 480 - 60) rec_hero.x = 480 - 60;
 
-		if (TimeUtils.nanoTime() - lastDropTime > 400000000) spawnFireDrop();
+		if (TimeUtils.nanoTime() - lastDropTime > 500000000) spawnFireDrop();
 
 		Iterator<Rectangle> iter = firedrops.iterator();
 		while (iter.hasNext()) {
-			Rectangle raindrop = iter.next();
-			raindrop.y -= 200 * Gdx.graphics.getDeltaTime();
-			if (raindrop.y + 64 < 0) iter.remove();
-			if (raindrop.overlaps(rec_hero)) {
+			Rectangle fireDrop = iter.next();
+			fireDrop.y -= 200 * Gdx.graphics.getDeltaTime();
+			if (fireDrop.y + 50 < 0) iter.remove();
+			if (fireDrop.y + 50 < rec_hero.y) {
+				isDodged++;
+				iter.remove();
+			}
+			if (fireDrop.overlaps(rec_hero)) {
 				isDodged = 0;
 				blastSound.play();
 				iter.remove();
 				batch.begin();
-				batch.draw(blastImage,  rec_hero.getX(), rec_hero.getY());
+				batch.draw(blastImage,  rec_hero.x, rec_hero.y);
 				batch.end();
-			if (!raindrop.overlaps(rec_hero)) {
-					isDodged++;
-				}
 			}
 		}
 	}
